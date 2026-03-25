@@ -63,17 +63,19 @@ const router = async () => {
         modals.forEach(modal => document.body.appendChild(modal)); // Modals should be at body root
         if (toastContainer) document.body.appendChild(toastContainer);
 
-        // Execute scripts
-        scripts.forEach(script => {
-            const newScript = document.createElement("script");
-            newScript.setAttribute("data-page-script", "true");
-            if (script.src) {
-                newScript.src = script.src;
-            } else {
-                newScript.textContent = script.textContent;
-            }
-            document.body.appendChild(newScript);
-        });
+        // Execute scripts with a tiny delay to ensure DOM is settled
+        setTimeout(() => {
+            scripts.forEach(script => {
+                const newScript = document.createElement("script");
+                newScript.setAttribute("data-page-script", "true");
+                if (script.src) {
+                    newScript.src = script.src;
+                } else {
+                    newScript.textContent = script.textContent;
+                }
+                document.body.appendChild(newScript);
+            });
+        }, 0);
         
     } catch (err) {
         console.error("Router error:", err);

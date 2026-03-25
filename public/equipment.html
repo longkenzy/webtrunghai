@@ -440,6 +440,8 @@
 
         function renderTable(data) {
             const tbody = document.getElementById('equipmentsBody');
+            if (!tbody) return; // Guard for null
+
             if (data.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="14" style="text-align:center; padding: 40px; color: var(--gray);">Không tìm thấy thiết bị nào.</td></tr>';
                 return;
@@ -632,6 +634,11 @@
                         const optionsContainer = document.getElementById('customDepartmentOptions');
                         const filterOptionsContainer = document.getElementById('customDeptFilterOptions');
                         
+                        if (!optionsContainer) {
+                            console.warn("Required element #customDepartmentOptions not found. Skipping...");
+                            return;
+                        }
+
                         optionsContainer.innerHTML = '';
                         // Giữ lại option đầu tiên cho bộ lọc (Tất cả phòng ban)
                         if (filterOptionsContainer) {
@@ -856,15 +863,19 @@
         loadDepartments();
 
         // Tự động chuyển trạng thái sang "Đang sửa chữa" khi nhập nội dung sửa chữa
-        document.getElementById('add_repair').addEventListener('input', (e) => {
-            const statusSelect = document.getElementById('add_status');
-            if (e.target.value.trim() !== '') {
-                statusSelect.value = 'Đang sửa chữa';
-            } else if (statusSelect.value === 'Đang sửa chữa') {
-                // Nếu xoá trắng thì có thể reset về mặc định hoặc để người dùng chọn lại
-                statusSelect.value = 'Sẵn sàng';
-            }
-        });
+        const addRepairInput = document.getElementById('add_repair');
+        if (addRepairInput) {
+            addRepairInput.addEventListener('input', (e) => {
+                const statusSelect = document.getElementById('add_status');
+                if (!statusSelect) return;
+                
+                if (e.target.value.trim() !== '') {
+                    statusSelect.value = 'Đang sửa chữa';
+                } else if (statusSelect.value === 'Đang sửa chữa') {
+                    statusSelect.value = 'Sẵn sàng';
+                }
+            });
+        }
     </script>
 </body>
 </html>
