@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/images/logo.png">
+    <title>Danh Sách Máy Trống | TrungHaiTech</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <!-- Top Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="/" class="navbar-logo">
+                <img src="/images/logo.png" alt="TrungHai Logo" class="brand-logo" onerror="this.onerror=null; this.src=''; this.style.display='none'; this.nextElementSibling.style.display='inline';">
+                <h2 style="display:none; color:var(--dark); font-size: 1.6rem; letter-spacing: -0.5px;">TrungHai<span style="color:var(--primary);">Tech</span></h2>
+            </a>
+            
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="/" class="nav-link">Trang chủ</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/equipment.html" class="nav-link">Danh sách thiết bị</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/repair.html" class="nav-link">Sửa chữa</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/available.html" class="nav-link active">Máy trống</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/config.html" class="nav-link">Cấu hình</a>
+                </li>
+            </ul>
+
+            <div class="nav-right">
+                <button class="btn-secondary" onclick="logout()">Đăng xuất <i class="fa-solid fa-arrow-right-from-bracket" style="margin-left: 5px;"></i></button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="page-container">
+        <div class="page-header fade-in-up">
+            <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                <div>
+                    <h1 class="page-title"><i class="fa-solid fa-rectangle-list" style="color: var(--success); margin-right: 8px;"></i> Kho Máy Trống (Sẵn sàng)</h1>
+                    <p style="color: var(--gray); margin-top: 5px;">Danh sách các thiết bị hiện chưa cấp phát cho ai, sẵn sàng để bàn giao.</p>
+                </div>
+                <div class="stats-badge" style="background: var(--success-light); color: var(--success); padding: 10px 20px; border-radius: 12px; font-weight: 600;">
+                    <span id="availableCount">0</span> máy đang trống
+                </div>
+            </div>
+        </div>
+
+        <div class="table-card fade-in-up delay-1" style="border-top: 4px solid var(--success);">
+            <div class="table-controls">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="searchInput" class="search-input" placeholder="Tìm tên máy hoặc cấu hình...">
+                </div>
+            </div>
+
+            <div class="data-table-wrapper">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px; text-align: center;">STT</th>
+                            <th>Tên máy</th>
+                            <th>Loại máy</th>
+                            <th>Cấu hình (CPU / RAM / ROM)</th>
+                            <th>Màn hình / Chuột / Phím</th>
+                            <th style="width: 140px; text-align: center;">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="availableBody">
+                        <tr>
+                            <td colspan="6" style="text-align:center; padding: 40px;">
+                                <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 2rem; color: var(--success);"></i>
+                                <p style="margin-top: 10px; color: var(--gray);">Đang kiểm tra kho...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script>
+        function showToast(title, message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            const iconClass = type === 'success' ? 'fa-circle-check' : 'fa-circle-exclamation';
+            toast.innerHTML = `
+                <div class="toast-icon"><i class="fa-solid ${iconClass}"></i></div>
+                <div class="toast-content">
+                    <span class="toast-title">${title}</span>
+                    <span class="toast-message">${message}</span>
+                </div>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.add('show'), 10);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 400);
+            }, 3000);
+        }
+
+        var allAvailableEquipments = [];
+
+        async function loadAvailableData() {
+            try {
+                const res = await fetch('/api/equipments');
+                if (res.status === 401) {
+                    window.location.href = '/login.html';
+                    return;
+                }
+                const result = await res.json();
+                
+                if (result.status === 'ok') {
+                    // Lọc những máy có trạng thái "Sẵn sàng"
+                    allAvailableEquipments = result.data.filter(eq => eq.status === 'Sẵn sàng');
+                    document.getElementById('availableCount').textContent = allAvailableEquipments.length;
+                    renderTable(allAvailableEquipments);
+                }
+            } catch (err) {
+                console.error("Lỗi khi tải dữ liệu", err);
+            }
+        }
+
+        function renderTable(data) {
+            const tbody = document.getElementById('availableBody');
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 60px; color: var(--gray);"><i class="fa-solid fa-box-open" style="font-size: 3rem; color: #e2e8f0; margin-bottom: 15px; display: block;"></i> Hiện tại kho đã hết máy trống. <a href="/equipment.html" style="color: var(--primary); text-decoration: underline;">Xem tất cả thiết bị</a></td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = data.map((eq, index) => {
+                const specHTML = [
+                    eq.cpu ? `CPU: ${eq.cpu}` : null,
+                    eq.ram ? `RAM: ${eq.ram}` : null,
+                    eq.rom ? `ROM: ${eq.rom}` : null
+                ].filter(Boolean).join(' | ') || '<span style="color:var(--gray-light)">Chưa rõ cấu hình</span>';
+                
+                const accessories = [
+                    eq.monitor ? `Màn: ${eq.monitor}` : null,
+                    eq.mouse ? `C: ${eq.mouse}` : null,
+                    eq.keyboard ? `P: ${eq.keyboard}` : null
+                ].filter(Boolean).join(', ') || '-';
+
+                return `
+                <tr>
+                    <td style="font-weight: 600; color: var(--gray); text-align: center;">${index + 1}</td>
+                    <td><div class="cell-name"><i class="fa-solid fa-cube" style="color:var(--success); margin-right:8px;"></i> ${eq.name}</div></td>
+                    <td><span class="status-badge" style="background:#f0fdf4; color:var(--success); border-color:#dcfce7;">${eq.category}</span></td>
+                    <td style="font-size: 0.85rem; color: var(--gray);">${specHTML}</td>
+                    <td style="font-size: 0.85rem; color: var(--gray);">${accessories}</td>
+                    <td style="text-align: center;">
+                        <button class="btn-primary" style="padding: 8px 15px; font-size: 0.85rem; background: var(--primary); border: none;" onclick="assignEquipment(${eq.id})" title="Cấp phát ngay">Cấp phát <i class="fa-solid fa-share-from-square"></i></button>
+                    </td>
+                </tr>
+                `;
+            }).join('');
+        }
+
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const text = e.target.value.toLowerCase();
+            const filtered = allAvailableEquipments.filter(eq => 
+                eq.name.toLowerCase().includes(text) || 
+                (eq.cpu && eq.cpu.toLowerCase().includes(text)) ||
+                (eq.ram && eq.ram.toLowerCase().includes(text))
+            );
+            renderTable(filtered);
+        });
+
+        function assignEquipment(id) {
+            // Chuyển sang trang danh sách chung để bàn giao (hoặc mở modal bàn giao ở đây tùy ý)
+            // Tạm thời điều hướng kèm ID
+            window.location.href = `/equipment.html?assignId=${id}`;
+        }
+
+        async function logout() {
+            await fetch('/api/logout', { method: 'POST' });
+            window.location.href = '/login.html';
+        }
+
+        // Khởi chạy
+        loadAvailableData();
+    </script>
+</body>
+</html>

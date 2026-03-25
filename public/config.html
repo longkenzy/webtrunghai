@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/images/logo.png">
+    <title>Cấu Hình Cấp Ngành | TrungHaiTech</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome cho icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- File CSS tùy chỉnh -->
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <!-- Top Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="/" class="navbar-logo">
+                <img src="/images/logo.png" alt="TrungHai Logo" class="brand-logo" onerror="this.onerror=null; this.src=''; this.style.display='none'; this.nextElementSibling.style.display='inline';">
+                <h2 style="display:none; color:var(--dark); font-size: 1.6rem; letter-spacing: -0.5px;">TrungHai<span style="color:var(--primary);">Tech</span></h2>
+            </a>
+            
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="/" class="nav-link">Trang chủ</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/equipment.html" class="nav-link">Danh sách thiết bị</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/repair.html" class="nav-link">Sửa chữa</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/available.html" class="nav-link">Máy trống</a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="/config.html" class="nav-link active">Cấu hình</a>
+                </li>
+            </ul>
+
+            <div class="nav-right">
+                <button class="btn-secondary" onclick="logout()">Đăng xuất <i class="fa-solid fa-arrow-right-from-bracket" style="margin-left: 5px;"></i></button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="page-container" style="max-width: 900px;">
+        <div class="page-header fade-in-up">
+            <h1 class="page-title"><i class="fa-solid fa-gear" style="color: var(--primary); margin-right: 8px;"></i> Cấu Hình Phòng Ban & Dự Án</h1>
+            <button class="btn-primary" onclick="openModal()">
+                <i class="fa-solid fa-plus"></i> Thêm Mới
+            </button>
+        </div>
+
+        <div class="table-card fade-in-up delay-1">
+            <div class="table-controls" style="background: #f8fafc; padding: 16px 20px;">
+                <p style="color: var(--gray); font-size: 0.95rem; margin: 0;">
+                    Danh sách các phòng ban và dự án dùng để phân bổ thiết bị trong hệ thống.
+                </p>
+            </div>
+
+            <!-- Table -->
+            <div class="data-table-wrapper">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 60px; text-align: center;">STT</th>
+                            <th style="width: 250px;">Tên Phòng Ban / Dự Án</th>
+                            <th>Mô tả chi tiết</th>
+                            <th style="width: 150px;">Ngày tạo</th>
+                            <th style="width: 100px; text-align: center;">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="departmentsBody">
+                        <tr>
+                            <td colspan="5" style="text-align:center; padding: 40px;">
+                                <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 2rem; color: var(--primary);"></i>
+                                <p style="margin-top: 10px; color: var(--gray);">Đang tải dữ liệu...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Thêm -->
+    <div class="modal-overlay" id="addModal">
+        <div class="modal-card" style="max-width: 500px;">
+            <div class="modal-header">
+                <div class="modal-title-wrapper">
+                    <div class="modal-icon" style="background: var(--primary-light); color: var(--primary);"><i class="fa-solid fa-building"></i></div>
+                    <div>
+                        <h2 class="modal-title">Thêm Mới</h2>
+                        <p class="modal-subtitle">Tạo phòng ban hoặc dự án mới</p>
+                    </div>
+                </div>
+                <button class="close-btn" type="button" onclick="closeModal()" title="Đóng"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="addForm">
+                <div class="modal-body">
+                    <div class="form-section" style="margin-bottom: 0;">
+                        <div class="form-grid" style="grid-template-columns: 1fr;">
+                            <div class="form-group">
+                                <label class="form-label">Tên Phòng ban / Dự án *</label>
+                                <div class="form-input-wrapper">
+                                    <input type="text" id="add_name" class="form-input has-icon" required placeholder="VD: Phòng IT / Dự án Alpha">
+                                    <i class="fa-solid fa-signature form-input-icon"></i>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Mô tả thêm</label>
+                                <div class="form-input-wrapper">
+                                    <textarea id="add_desc" class="form-input" placeholder="Ghi chú chi tiết về dự án hoặc phòng ban..." style="min-height: 100px; resize: vertical;"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closeModal()">Hủy thao tác</button>
+                    <button type="submit" class="btn-primary"><i class="fa-solid fa-floppy-disk"></i> Lưu Thay Đổi</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Xoá -->
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal-card" style="max-width: 480px; align-self: center;">
+            <div class="modal-body" style="padding: 40px 32px; text-align: center; border-radius: 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; flex: unset; overflow-y: visible;">
+                <div style="width: 72px; height: 72px; background: #FEF2F2; color: var(--danger); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; margin: 0 auto 24px;">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+                <h2 class="modal-title" style="margin-bottom: 12px; font-size: 1.6rem; color: var(--dark);">Xác nhận xoá</h2>
+                <p style="color: var(--gray); font-size: 1rem; line-height: 1.6; margin-bottom: 32px; max-width: 90%;">
+                    Bạn có chắc chắn muốn xoá mục này khỏi danh mục hệ thống?
+                </p>
+                <div style="display: flex; gap: 16px; justify-content: center; width: 100%;">
+                    <button type="button" class="btn-secondary" style="flex: 1; justify-content: center; padding: 12px; font-size: 1.05rem;" onclick="closeDeleteModal()">Hủy Quay Lại</button>
+                    <button type="button" class="btn-primary" style="flex: 1; justify-content: center; background: linear-gradient(135deg, var(--danger), #ef4444); box-shadow: 0 4px 10px rgba(239, 68, 68, 0.25); padding: 12px; font-size: 1.05rem;" id="confirmDeleteBtn"><i class="fa-solid fa-trash-can"></i> Vâng, Xoá Ngay</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script>
+        // Toast Notification System
+        function showToast(title, message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            
+            const iconClass = type === 'success' ? 'fa-circle-check' : 'fa-circle-exclamation';
+            
+            toast.innerHTML = `
+                <div class="toast-icon">
+                    <i class="fa-solid ${iconClass}"></i>
+                </div>
+                <div class="toast-content">
+                    <span class="toast-title">${title}</span>
+                    <span class="toast-message">${message}</span>
+                </div>
+            `;
+            
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.add('show'), 10);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 400);
+            }, 3000);
+        }
+
+        async function loadData() {
+            try {
+                const res = await fetch('/api/departments');
+                if (res.status === 401) {
+                    window.location.href = '/login.html';
+                    return;
+                }
+                const result = await res.json();
+                
+                if (result.status === 'ok') {
+                    renderTable(result.data);
+                }
+            } catch (err) {
+                console.error("Lỗi khi tải dữ liệu", err);
+            }
+        }
+
+        function renderTable(data) {
+            const tbody = document.getElementById('departmentsBody');
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 40px; color: var(--gray);">Chưa có phòng ban hay dự án nào được tạo.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = data.map((item, index) => {
+                const date = new Date(item.created_at).toLocaleDateString('vi-VN');
+                return `
+                <tr>
+                    <td style="font-weight: 600; color: var(--gray); text-align: center;">${index + 1}</td>
+                    <td><div class="cell-name"><i class="fa-regular fa-building" style="color:var(--primary); margin-right:6px;"></i> ${item.name}</div></td>
+                    <td style="color: var(--gray);">${item.description || '-'}</td>
+                    <td style="color: var(--gray-light);">${date}</td>
+                    <td style="text-align: center;">
+                        <button class="action-btn delete" title="Xóa" onclick="openDeleteModal(${item.id})"><i class="fa-regular fa-trash-can"></i></button>
+                    </td>
+                </tr>
+                `;
+            }).join('');
+        }
+
+        async function logout() {
+            await fetch('/api/logout', { method: 'POST' });
+            window.location.href = '/login.html';
+        }
+
+        // Add Logic
+        function openModal() { document.getElementById('addModal').classList.add('active'); }
+        function closeModal() {
+            document.getElementById('addModal').classList.remove('active');
+            document.getElementById('addForm').reset();
+        }
+
+        document.getElementById('addForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            var btn = e.target.querySelector('button[type="submit"]');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang lưu...';
+            btn.disabled = true;
+
+            var payload = {
+                name: document.getElementById('add_name').value.trim(),
+                description: document.getElementById('add_desc').value.trim()
+            };
+            
+            try {
+                const res = await fetch('/api/departments', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if(data.status === 'ok') {
+                    closeModal();
+                    showToast('Thành công', 'Đã thêm danh mục mới', 'success');
+                    loadData();
+                } else {
+                    showToast('Lỗi', data.message || 'Lỗi thêm dữ liệu', 'error');
+                }
+            } catch (err) {
+                showToast('Lỗi', 'Lỗi kết nối máy chủ', 'error');
+            } finally {
+                btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Lưu Thay Đổi';
+                btn.disabled = false;
+            }
+        });
+
+        // Delete Logic
+        var elementToDelete = null;
+
+        function openDeleteModal(id) {
+            elementToDelete = id;
+            document.getElementById('deleteModal').classList.add('active');
+        }
+
+        function closeDeleteModal() {
+            elementToDelete = null;
+            document.getElementById('deleteModal').classList.remove('active');
+        }
+
+        document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
+            if (!elementToDelete) return;
+            const btn = document.getElementById('confirmDeleteBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang xoá...';
+            btn.disabled = true;
+
+            try {
+                const res = await fetch(`/api/departments/${elementToDelete}`, {
+                    method: 'DELETE'
+                });
+                const data = await res.json();
+                if (data.status === 'ok') {
+                    closeDeleteModal();
+                    showToast('Xoá thành công', 'Danh mục đã được gõ bỏ.', 'success');
+                    loadData();
+                } else {
+                    showToast('Lỗi', data.message || 'Lỗi xoá dữ liệu', 'error');
+                }
+            } catch (err) {
+                showToast('Lỗi', 'Lỗi kết nối máy chủ', 'error');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        });
+
+        // Init
+        loadData();
+    </script>
+</body>
+</html>

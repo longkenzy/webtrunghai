@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/images/logo.png">
+    <title>Trạm Sửa Chữa | TrungHaiTech</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <!-- Top Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="/" class="navbar-logo">
+                <img src="/images/logo.png" alt="TrungHai Logo" class="brand-logo" onerror="this.onerror=null; this.src=''; this.style.display='none'; this.nextElementSibling.style.display='inline';">
+                <h2 style="display:none; color:var(--dark); font-size: 1.6rem; letter-spacing: -0.5px;">TrungHai<span style="color:var(--primary);">Tech</span></h2>
+            </a>
+            
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="/" class="nav-link">Trang chủ</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/equipment.html" class="nav-link">Danh sách thiết bị</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/repair.html" class="nav-link active">Sửa chữa</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/available.html" class="nav-link">Máy trống</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/config.html" class="nav-link">Cấu hình</a>
+                </li>
+            </ul>
+
+            <div class="nav-right">
+                <button class="btn-secondary" onclick="logout()">Đăng xuất <i class="fa-solid fa-arrow-right-from-bracket" style="margin-left: 5px;"></i></button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="page-container">
+        <div class="page-header fade-in-up">
+            <h1 class="page-title"><i class="fa-solid fa-wrench" style="color: var(--danger); margin-right: 8px;"></i> Máy Đang Sửa Chữa</h1>
+            <p style="color: var(--gray); margin-top: 5px;">Quản lý và theo dõi tiến độ các thiết bị đang hỏng hóc hoặc đi bảo hành.</p>
+        </div>
+
+        <div class="table-card fade-in-up delay-1">
+            <div class="table-controls">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="searchInput" class="search-input" placeholder="Tìm kiếm theo tên thiết bị hoặc phòng ban...">
+                </div>
+            </div>
+
+            <div class="data-table-wrapper">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px; text-align: center;">STT</th>
+                            <th>Tên máy</th>
+                            <th>Loại máy</th>
+                            <th>Cấu hình cơ bản</th>
+                            <th>Người sử dụng</th>
+                            <th>Phòng ban - Dự án</th>
+                            <th style="width: 120px;">Ngày sửa chữa</th>
+                            <th>Lịch sử lỗi / Sửa chữa ghi nhận</th>
+                            <th style="width: 140px; text-align: center;">Đổi trạng thái</th>
+                        </tr>
+                    </thead>
+                    <tbody id="repairBody">
+                        <tr>
+                            <td colspan="9" style="text-align:center; padding: 40px;">
+                                <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 2rem; color: var(--danger);"></i>
+                                <p style="margin-top: 10px; color: var(--gray);">Đang tải dữ liệu sửa chữa...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Xem Lịch Sử Sửa Chữa Đầy Đủ (Tái sử dụng) -->
+    <div class="modal-overlay" id="repairHistoryModal">
+        <div class="modal-card" style="max-width: 600px;">
+            <div class="modal-header">
+                <div class="modal-title-wrapper">
+                    <div class="modal-icon" style="background: #FFFBEB; color: var(--warning);"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                    <div>
+                        <h2 class="modal-title">Ghi Chú Lỗi Đầy Đủ</h2>
+                        <p class="modal-subtitle">Chi tiết các lỗi và ghi chú đã được nhập của thiết bị này</p>
+                    </div>
+                </div>
+                <button class="close-btn" type="button" onclick="closeRepairHistory()" title="Đóng"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <div id="repairHistoryContent" style="padding: 20px; background: #ffffff; border-radius: 12px; border: 1px dashed #e2e8f0; white-space: pre-wrap; word-break: break-word; line-height: 1.6; color: var(--dark); min-height: 120px; font-size: 0.95rem;">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="closeRepairHistory()">Đóng Cửa Sổ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Đổi Trạng Thái Sửa Xong -->
+    <div class="modal-overlay" id="finishRepairModal">
+        <div class="modal-card" style="max-width: 480px; align-self: center;">
+            <div class="modal-body" style="padding: 40px 32px; text-align: center; border-radius: 24px;">
+                <div style="width: 72px; height: 72px; background: #ECFDF5; color: var(--success); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; margin: 0 auto 24px;">
+                    <i class="fa-solid fa-shield-check"></i>
+                </div>
+                <h2 class="modal-title" style="margin-bottom: 12px; font-size: 1.6rem; color: var(--dark);">Sửa Chữa Hoàn Tất?</h2>
+                <p style="color: var(--gray); font-size: 1rem; line-height: 1.6; margin-bottom: 32px;">
+                    Đánh dấu thiết bị này là <strong>Sẵn sàng</strong>. Thiết bị sẽ được chuyển về Danh Sách Máy Trống hoặc Danh Sách Chung.
+                </p>
+                <div style="display: flex; gap: 16px; justify-content: center; width: 100%;">
+                    <button type="button" class="btn-secondary" style="flex: 1; padding: 12px; font-size: 1.05rem;" onclick="closeFinishRepairModal()">Chưa Xong</button>
+                    <button type="button" class="btn-primary" style="flex: 1; background: linear-gradient(135deg, var(--success), #34d399); box-shadow: 0 4px 10px rgba(16, 185, 129, 0.25); padding: 12px; font-size: 1.05rem;" id="confirmFinishRepairBtn"><i class="fa-solid fa-check"></i> Đã Sửa Xong</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script>
+        function showToast(title, message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            const iconClass = type === 'success' ? 'fa-circle-check' : 'fa-circle-exclamation';
+            toast.innerHTML = `
+                <div class="toast-icon"><i class="fa-solid ${iconClass}"></i></div>
+                <div class="toast-content">
+                    <span class="toast-title">${title}</span>
+                    <span class="toast-message">${message}</span>
+                </div>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.add('show'), 10);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 400);
+            }, 3000);
+        }
+
+        var allBrokenEquipments = [];
+
+        async function loadRepairData() {
+            try {
+                const res = await fetch('/api/equipments');
+                if (res.status === 401) {
+                    window.location.href = '/login.html';
+                    return;
+                }
+                const result = await res.json();
+                
+                if (result.status === 'ok') {
+                    // Cốt lõi: Chỉ lọc ra các máy "Đang sửa chữa"
+                    allBrokenEquipments = result.data.filter(eq => eq.status === 'Đang sửa chữa');
+                    renderTable(allBrokenEquipments);
+                }
+            } catch (err) {
+                console.error("Lỗi khi tải dữ liệu", err);
+            }
+        }
+
+        function renderTable(data) {
+            const tbody = document.getElementById('repairBody');
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding: 50px; color: var(--success); font-weight: 500; font-size: 1.1rem;"><i class="fa-solid fa-party-horn" style="margin-right:8px; font-size: 1.5rem;"></i> Tuyệt vời! Hiện tại không có thiết bị nào đang bị hỏng hóc hoặc cần sửa chữa.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = data.map((eq, index) => {
+                const specHTML = [
+                    eq.cpu ? `CPU: ${eq.cpu}` : null,
+                    eq.ram ? `RAM: ${eq.ram}` : null,
+                    eq.rom ? `ROM: ${eq.rom}` : null
+                ].filter(Boolean).join(' | ') || '<span style="color:var(--gray-light)">Chưa rõ cấu hình</span>';
+                
+                const repairDate = eq.repair_date ? new Date(eq.repair_date).toLocaleString('vi-VN') : '<span style="color:var(--gray-light)">-</span>';
+                
+                return `
+                <tr>
+                    <td style="font-weight: 600; color: var(--gray); text-align: center;">${index + 1}</td>
+                    <td><div class="cell-name"><i class="fa-solid fa-screwdriver-wrench" style="color:var(--danger); margin-right:6px;"></i> ${eq.name}</div></td>
+                    <td><span class="status-badge" style="background:#f1f5f9; color:var(--dark); border-color:#e2e8f0;"><i class="fa-solid fa-laptop" style="color:var(--gray);"></i> ${eq.category}</span></td>
+                    <td style="font-size: 0.85rem; color: var(--gray);">${specHTML}</td>
+                    <td>${eq.assigned_to || '<span style="color:var(--gray-light)">Trống</span>'}</td>
+                    <td>${eq.department || '<span style="color:var(--gray-light)">Trống</span>'}</td>
+                    <td style="font-size: 0.85rem; color: var(--gray);">${repairDate}</td>
+                    <td>
+                        ${eq.repair_history && eq.repair_history.length > 30 
+                            ? `<span style="color: var(--danger); font-size: 0.85rem;">${eq.repair_history.substring(0, 30)}...</span> <button class="btn-secondary" style="padding: 2px 8px; font-size: 0.75rem; border-radius: 4px; border: none; background: #fee2e2; color: var(--danger);" onclick="viewRepairHistory(${eq.id})">Xem chi tiết</button>` 
+                            : `<span style="color: var(--danger); font-size: 0.85rem;">${eq.repair_history || '-'}</span>`
+                        }
+                    </td>
+                    <td style="text-align: center;">
+                        <button class="btn-primary" style="padding: 8px 12px; font-size: 0.85rem; background: linear-gradient(135deg, var(--success), #34d399); border: none; box-shadow: 0 2px 6px rgba(16, 185, 129, 0.2);" onclick="openFinishRepairModal(${eq.id})" title="Đánh dấu sửa xong"><i class="fa-solid fa-check"></i> Đã Sửa Xong</button>
+                    </td>
+                </tr>
+                `;
+            }).join('');
+        }
+
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const text = e.target.value.toLowerCase();
+            const filtered = allBrokenEquipments.filter(eq => 
+                eq.name.toLowerCase().includes(text) || 
+                (eq.department && eq.department.toLowerCase().includes(text))
+            );
+            renderTable(filtered);
+        });
+
+        // Logistics Modal Lịch sử lỗi
+        function viewRepairHistory(id) {
+            const eq = allBrokenEquipments.find(e => e.id === id);
+            if (!eq) return;
+            document.getElementById('repairHistoryContent').textContent = eq.repair_history;
+            document.getElementById('repairHistoryModal').classList.add('active');
+        }
+
+        function closeRepairHistory() {
+            document.getElementById('repairHistoryModal').classList.remove('active');
+        }
+
+        // Logistics Đổi Trạng Thái Sửa Xong
+        var equipmentToMarkReady = null;
+
+        function openFinishRepairModal(id) {
+            equipmentToMarkReady = id;
+            document.getElementById('finishRepairModal').classList.add('active');
+        }
+
+        function closeFinishRepairModal() {
+            equipmentToMarkReady = null;
+            document.getElementById('finishRepairModal').classList.remove('active');
+        }
+
+        document.getElementById('confirmFinishRepairBtn').addEventListener('click', async () => {
+            if (!equipmentToMarkReady) return;
+            const btn = document.getElementById('confirmFinishRepairBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang cập nhật...';
+            btn.disabled = true;
+
+            try {
+                const res = await fetch(`/api/equipments/${equipmentToMarkReady}/status`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: 'Sẵn sàng' })
+                });
+                const data = await res.json();
+                if (data.status === 'ok') {
+                    closeFinishRepairModal();
+                    showToast('Đã được sửa!', 'Thiết bị đã chuyển về trạng thái Sẵn sàng.', 'success');
+                    loadRepairData(); // Cập nhật lại list máy hỏng
+                } else {
+                    showToast('Lỗi', data.message || 'Lỗi hệ thống', 'error');
+                }
+            } catch (err) {
+                showToast('Lỗi', 'Lỗi kết nối máy chủ', 'error');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        });
+
+        async function logout() {
+            await fetch('/api/logout', { method: 'POST' });
+            window.location.href = '/login.html';
+        }
+
+        // Khởi chạy
+        loadRepairData();
+    </script>
+</body>
+</html>

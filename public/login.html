@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/images/logo.png">
+    <title>Đăng Nhập Hệ Thống | TrungHaiTech</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        .login-page {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: radial-gradient(circle at top right, #e0e7ff 0%, #f8fafc 40%, #f1f5f9 100%);
+            padding: 20px;
+        }
+
+        .login-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+            width: 100%;
+            max-width: 420px;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .login-logo {
+            display: inline-flex;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .login-logo img {
+            height: 52px;
+            object-fit: contain;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--dark-light);
+            margin-bottom: 8px;
+        }
+
+        .form-input-container {
+            position: relative;
+        }
+
+        .form-input-container i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+            font-size: 1rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 14px 12px 40px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            font-size: 0.95rem;
+            background: rgba(255, 255, 255, 0.8);
+            transition: all 0.3s ease;
+            color: var(--dark);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+            background: #fff;
+        }
+
+        .btn-login {
+            width: 100%;
+            margin-top: 10px;
+            justify-content: center;
+            font-size: 1rem;
+            padding: 14px;
+        }
+
+        .error-message {
+            color: var(--danger);
+            font-size: 0.85rem;
+            margin-top: 16px;
+            font-weight: 500;
+            display: none;
+            background: #FEF2F2;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #FECACA;
+        }
+    </style>
+</head>
+<body class="login-page">
+    <div class="login-card">
+        <a href="#" class="login-logo">
+            <img src="/images/logo.png" alt="TrungHai Logo" onerror="this.onerror=null; this.src=''; this.style.display='none'; this.nextElementSibling.style.display='inline';">
+            <h2 style="display:none; color:var(--dark); font-size: 1.8rem; letter-spacing: -0.5px;">TrungHai<span style="color:var(--primary);">Tech</span></h2>
+        </a>
+        
+        <h2 style="font-size: 1.6rem; color: var(--dark); margin-bottom: 8px;">Đăng Nhập</h2>
+        <p style="color: var(--gray); font-size: 0.9rem; margin-bottom: 30px;">Hệ thống quản lý thiết bị nội bộ</p>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label class="form-label">Tài Khoản</label>
+                <div class="form-input-container">
+                    <i class="fa-regular fa-user"></i>
+                    <input type="text" id="username" class="form-input" placeholder="Nhập tên đăng nhập" required autocomplete="username">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Mật Khẩu</label>
+                <div class="form-input-container">
+                    <i class="fa-solid fa-lock"></i>
+                    <input type="password" id="password" class="form-input" placeholder="Nhập mật khẩu" required autocomplete="current-password">
+                </div>
+            </div>
+            
+            <div id="errorMsg" class="error-message">
+                <i class="fa-solid fa-circle-exclamation" style="margin-right: 4px;"></i> 
+                <span>Sai tài khoản hoặc mật khẩu!</span>
+            </div>
+            
+            <button type="submit" class="btn-primary btn-login">
+                Đăng nhập hệ thống <i class="fa-solid fa-right-to-bracket" style="margin-left: 6px;"></i>
+            </button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const u = document.getElementById('username').value.trim();
+            const p = document.getElementById('password').value;
+            const errBox = document.getElementById('errorMsg');
+            const errSpan = errBox.querySelector('span');
+            
+            errBox.style.display = 'none';
+
+            try {
+                const res = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: u, password: p })
+                });
+
+                if (res.ok) {
+                    // Chuyển hướng về trang chủ
+                    window.location.href = '/';
+                } else {
+                    const data = await res.json();
+                    errSpan.textContent = data.message || 'Sai tài khoản hoặc mật khẩu!';
+                    errBox.style.display = 'block';
+                }
+            } catch (error) {
+                errSpan.textContent = 'Lỗi kết nối máy chủ.';
+                errBox.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

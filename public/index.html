@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/images/logo.png">
+    <title>TrungHaiTech | Quản Lý Thiết Bị</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome cho icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- File CSS tùy chỉnh -->
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <!-- Top Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="/" class="navbar-logo" data-link>
+                <img src="/images/logo.png" alt="TrungHai Logo" class="brand-logo" onerror="this.onerror=null; this.src=''; this.style.display='none'; this.nextElementSibling.style.display='inline';">
+                <h2 style="display:none; color:var(--dark); font-size: 1.6rem; letter-spacing: -0.5px;">TrungHai<span style="color:var(--primary);">Tech</span></h2>
+            </a>
+            
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="/" class="nav-link" data-link>Trang chủ</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/equipment" class="nav-link" data-link>Danh sách thiết bị</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/repair" class="nav-link" data-link>Sửa chữa</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/available" class="nav-link" data-link>Máy trống</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/config" class="nav-link" data-link>Cấu hình</a>
+                </li>
+            </ul>
+
+            <div class="nav-right">
+                <button class="btn-secondary" onclick="logout()">Đăng xuất <i class="fa-solid fa-arrow-right-from-bracket" style="margin-left: 5px;"></i></button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Content Container for SPA -->
+    <div id="app-root" class="fade-in"></div>
+
+    <script src="/router.js"></script>
+    <script>
+        async function logout() {
+            await fetch('/api/logout', { method: 'POST' });
+            window.location.href = '/login.html';
+        }
+    </script>
+</body>
+</html>
