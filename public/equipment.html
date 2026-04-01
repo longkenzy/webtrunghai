@@ -863,7 +863,7 @@
         loadDepartments();
 
         // Tự động chuyển trạng thái sang "Đang sửa chữa" khi nhập nội dung sửa chữa
-        const addRepairInput = document.getElementById('add_repair');
+        var addRepairInput = document.getElementById('add_repair');
         if (addRepairInput) {
             addRepairInput.addEventListener('input', (e) => {
                 const statusSelect = document.getElementById('add_status');
