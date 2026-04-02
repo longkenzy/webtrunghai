@@ -51,13 +51,41 @@
     <!-- Main Content -->
     <main class="page-container" style="max-width: 900px;">
         <div class="page-header fade-in-up">
-            <h1 class="page-title"><i class="fa-solid fa-gear" style="color: var(--primary); margin-right: 8px;"></i> Cấu Hình Phòng Ban & Dự Án</h1>
-            <button class="btn-primary" onclick="openModal()">
-                <i class="fa-solid fa-plus"></i> Thêm Mới
-            </button>
+            <h1 class="page-title"><i class="fa-solid fa-gear" style="color: var(--primary); margin-right: 8px;"></i> Cấu Hình Công Ty & Phòng Ban</h1>
+            
         </div>
 
-        <div class="table-card fade-in-up delay-1">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;" class="fade-in-up"><h2><i class="fa-solid fa-building" style="color:var(--primary); margin-right:8px;"></i> Công Ty</h2><button class="btn-primary" onclick="openCompanyModal()"><i class="fa-solid fa-plus"></i> Thêm Công Ty</button></div><div class="table-card fade-in-up delay-2">
+            <div class="table-controls" style="background: #f8fafc; padding: 16px 20px;">
+                <p style="color: var(--gray); font-size: 0.95rem; margin: 0;">
+                    Danh sách các phòng ban và dự án dùng để phân bổ thiết bị trong hệ thống.
+                </p>
+            </div>
+
+            <!-- Table -->
+            <div class="data-table-wrapper">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 60px; text-align: center;">STT</th>
+                            <th style="width: 250px;">Tên Công Ty</th>
+                            <th>Mô tả chi tiết</th>
+                            <th style="width: 150px;">Ngày tạo</th>
+                            <th style="width: 100px; text-align: center;">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="companiesBody">
+                        <tr>
+                            <td colspan="5" style="text-align:center; padding: 40px;">
+                                <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 2rem; color: var(--primary);"></i>
+                                <p style="margin-top: 10px; color: var(--gray);">Đang tải dữ liệu...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; margin-top: 30px;" class="fade-in-up delay-1"><h2><i class="fa-solid fa-sitemap" style="color:var(--primary); margin-right:8px;"></i> Phòng Ban & Dự Án</h2><button class="btn-primary" onclick="openModal()"><i class="fa-solid fa-plus"></i> Thêm Phòng Ban</button></div><div class="table-card fade-in-up ">
             <div class="table-controls" style="background: #f8fafc; padding: 16px 20px;">
                 <p style="color: var(--gray); font-size: 0.95rem; margin: 0;">
                     Danh sách các phòng ban và dự án dùng để phân bổ thiết bị trong hệ thống.
@@ -130,6 +158,48 @@
         </div>
     </div>
 
+    
+<!-- Modal Thêm -->
+    <div class="modal-overlay" id="addCompanyModal">
+        <div class="modal-card" style="max-width: 500px;">
+            <div class="modal-header">
+                <div class="modal-title-wrapper">
+                    <div class="modal-icon" style="background: var(--primary-light); color: var(--primary);"><i class="fa-solid fa-building"></i></div>
+                    <div>
+                        <h2 class="modal-title">Thêm Mới</h2>
+                        <p class="modal-subtitle">Thêm công ty đối tác hoặc tổ chức mới</p>
+                    </div>
+                </div>
+                <button class="close-btn" type="button" onclick="closeCompanyModal()" title="Đóng"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="addCompanyForm">
+                <div class="modal-body">
+                    <div class="form-section" style="margin-bottom: 0;">
+                        <div class="form-grid" style="grid-template-columns: 1fr;">
+                            <div class="form-group">
+                                <label class="form-label">Tên Công Ty *</label>
+                                <div class="form-input-wrapper">
+                                    <input type="text" id="add_company_name" class="form-input has-icon" required placeholder="VD: Công ty TNHH ABC">
+                                    <i class="fa-solid fa-signature form-input-icon"></i>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Mô tả thêm</label>
+                                <div class="form-input-wrapper">
+                                    <textarea id="add_company_desc" class="form-input" placeholder="Ghi chú chi tiết về dự án hoặc phòng ban..." style="min-height: 100px; resize: vertical;"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closeCompanyModal()">Hủy thao tác</button>
+                    <button type="submit" class="btn-primary"><i class="fa-solid fa-floppy-disk"></i> Lưu Thay Đổi</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Modal Xoá -->
     <div class="modal-overlay" id="deleteModal">
         <div class="modal-card" style="max-width: 480px; align-self: center;">
@@ -153,25 +223,26 @@
     <div id="toastContainer" class="toast-container"></div>
 
     <script>
-        // Toast Notification System
+        // --- GLOBAL STATE ---
+        var elementToDelete = null;
+        var companyToDelete = null;
+        var currentEditId = null;
+        var isEditing = false;
+
+        // --- UTILS ---
         function showToast(title, message, type = 'success') {
             const container = document.getElementById('toastContainer');
             if (!container) return;
             const toast = document.createElement('div');
             toast.className = `toast toast-${type}`;
-            
             const iconClass = type === 'success' ? 'fa-circle-check' : 'fa-circle-exclamation';
-            
             toast.innerHTML = `
-                <div class="toast-icon">
-                    <i class="fa-solid ${iconClass}"></i>
-                </div>
+                <div class="toast-icon"><i class="fa-solid ${iconClass}"></i></div>
                 <div class="toast-content">
                     <span class="toast-title">${title}</span>
                     <span class="toast-message">${message}</span>
                 </div>
             `;
-            
             container.appendChild(toast);
             setTimeout(() => toast.classList.add('show'), 10);
             setTimeout(() => {
@@ -180,133 +251,244 @@
             }, 3000);
         }
 
-        async function loadData() {
-            try {
-                const res = await fetch('/api/departments');
-                if (res.status === 401) {
-                    window.location.href = '/login.html';
-                    return;
-                }
-                const result = await res.json();
-                
-                if (result.status === 'ok') {
-                    renderTable(result.data);
-                }
-            } catch (err) {
-                console.error("Lỗi khi tải dữ liệu", err);
-            }
-        }
-
-        function renderTable(data) {
-            const tbody = document.getElementById('departmentsBody');
-            if (data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 40px; color: var(--gray);">Chưa có phòng ban hay dự án nào được tạo.</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = data.map((item, index) => {
-                const date = new Date(item.created_at).toLocaleDateString('vi-VN');
-                return `
-                <tr>
-                    <td style="font-weight: 600; color: var(--gray); text-align: center;">${index + 1}</td>
-                    <td><div class="cell-name"><i class="fa-regular fa-building" style="color:var(--primary); margin-right:6px;"></i> ${item.name}</div></td>
-                    <td style="color: var(--gray);">${item.description || '-'}</td>
-                    <td style="color: var(--gray-light);">${date}</td>
-                    <td style="text-align: center;">
-                        <button class="action-btn delete" title="Xóa" onclick="openDeleteModal(${item.id})"><i class="fa-regular fa-trash-can"></i></button>
-                    </td>
-                </tr>
-                `;
-            }).join('');
-        }
-
         async function logout() {
             await fetch('/api/logout', { method: 'POST' });
             window.location.href = '/login.html';
         }
 
-        // Add Logic
+        // --- DEPARTMENT FUNCTIONS ---
         function openModal() { document.getElementById('addModal').classList.add('active'); }
         function closeModal() {
             document.getElementById('addModal').classList.remove('active');
             document.getElementById('addForm').reset();
+            currentEditId = null;
+            isEditing = false;
+            document.querySelector('#addModal .modal-title').textContent = 'Thêm Mới';
         }
 
-        document.getElementById('addForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            var btn = e.target.querySelector('button[type="submit"]');
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang lưu...';
-            btn.disabled = true;
-
-            var payload = {
-                name: document.getElementById('add_name').value.trim(),
-                description: document.getElementById('add_desc').value.trim()
-            };
-            
+        async function loadData() {
             try {
-                const res = await fetch('/api/departments', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                const data = await res.json();
-                if(data.status === 'ok') {
-                    closeModal();
-                    showToast('Thành công', 'Đã thêm danh mục mới', 'success');
-                    loadData();
+                const res = await fetch('/api/departments');
+                if (res.status === 401) { window.location.href = '/login.html'; return; }
+                const result = await res.json();
+                if (result.status === 'ok') {
+                    renderTable(result.data);
                 } else {
-                    showToast('Lỗi', data.message || 'Lỗi thêm dữ liệu', 'error');
+                    renderTable([]);
                 }
-            } catch (err) {
-                showToast('Lỗi', 'Lỗi kết nối máy chủ', 'error');
-            } finally {
-                btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Lưu Thay Đổi';
-                btn.disabled = false;
+            } catch (err) { 
+                console.error("Lỗi khi tải dữ liệu phòng ban", err); 
+                renderTable([]);
             }
-        });
+        }
 
-        // Delete Logic
-        var elementToDelete = null;
+        function renderTable(data) {
+            const tbody = document.getElementById('departmentsBody');
+            if (!tbody) return;
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 40px; color: var(--gray);">Chưa có phòng ban hay dự án nào.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = data.map((item, index) => {
+                const date = new Date(item.created_at).toLocaleDateString('vi-VN');
+                return `<tr>
+                    <td style="font-weight: 600; color: var(--gray); text-align: center;">${index + 1}</td>
+                    <td><div class="cell-name"><i class="fa-regular fa-building" style="color:var(--primary); margin-right:6px;"></i> ${item.name}</div></td>
+                    <td style="color: var(--gray);">${item.description || '-'}</td>
+                    <td style="color: var(--gray-light);">${date}</td>
+                    <td style="text-align: center;">
+                        <button class="action-btn" title="Sửa" onclick="openEditModal(${JSON.stringify(item).replace(/"/g, '&quot;')})"><i class="fa-regular fa-pen-to-square"></i></button>
+                        <button class="action-btn delete" title="Xóa" onclick="openDeleteModal(${item.id})"><i class="fa-regular fa-trash-can"></i></button>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        function openEditModal(item) {
+            isEditing = true;
+            currentEditId = item.id;
+            document.getElementById('add_name').value = item.name;
+            document.getElementById('add_desc').value = item.description || '';
+            document.querySelector('#addModal .modal-title').textContent = 'Chỉnh Sửa';
+            document.getElementById('addModal').classList.add('active');
+        }
 
         function openDeleteModal(id) {
             elementToDelete = id;
+            companyToDelete = null; // Clear company deletion flag
             document.getElementById('deleteModal').classList.add('active');
         }
 
         function closeDeleteModal() {
             elementToDelete = null;
+            companyToDelete = null;
             document.getElementById('deleteModal').classList.remove('active');
         }
 
-        document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
-            if (!elementToDelete) return;
-            const btn = document.getElementById('confirmDeleteBtn');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang xoá...';
-            btn.disabled = true;
+        // --- COMPANY FUNCTIONS ---
+        function openCompanyModal() { document.getElementById('addCompanyModal').classList.add('active'); }
+        function closeCompanyModal() {
+            document.getElementById('addCompanyModal').classList.remove('active');
+            const form = document.getElementById('addCompanyForm');
+            if (form) form.reset();
+            currentEditId = null;
+            isEditing = false;
+            document.querySelector('#addCompanyModal .modal-title').textContent = 'Thêm Mới';
+        }
 
+        async function loadCompanies() {
             try {
-                const res = await fetch(`/api/departments/${elementToDelete}`, {
-                    method: 'DELETE'
-                });
+                const res = await fetch('/api/companies');
                 const data = await res.json();
                 if (data.status === 'ok') {
-                    closeDeleteModal();
-                    showToast('Xoá thành công', 'Danh mục đã được gõ bỏ.', 'success');
-                    loadData();
+                    renderCompanies(data.data);
                 } else {
-                    showToast('Lỗi', data.message || 'Lỗi xoá dữ liệu', 'error');
+                    renderCompanies([]);
                 }
-            } catch (err) {
-                showToast('Lỗi', 'Lỗi kết nối máy chủ', 'error');
-            } finally {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
+            } catch (err) { 
+                console.error("Lỗi khi tải danh sách công ty", err); 
+                renderCompanies([]);
             }
-        });
+        }
 
-        // Init
-        loadData();
+        function renderCompanies(data) {
+            const tbody = document.getElementById('companiesBody');
+            if (!tbody) return;
+            if (!data || data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--gray);padding:30px;">Chưa có công ty nào được tạo.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = data.map((item, i) => {
+                const date = new Date(item.created_at).toLocaleDateString('vi-VN');
+                return `<tr>
+                    <td style="text-align: center; color: var(--gray);">${i+1}</td>
+                    <td style="font-weight: 500; color: var(--dark);"><div style="display:flex; align-items:center;"><i class="fa-solid fa-building" style="color:var(--primary); margin-right:8px;"></i> ${item.name}</div></td>
+                    <td style="color: var(--gray); font-size: 0.9rem;">${item.description || '-'}</td>
+                    <td style="color: var(--gray-light);">${date}</td>
+                    <td style="text-align: center;">
+                        <button class="action-btn" title="Sửa" onclick="openEditCompanyModal(${JSON.stringify(item).replace(/"/g, '&quot;')})"><i class="fa-regular fa-pen-to-square"></i></button>
+                        <button class="action-btn delete" title="Xóa" onclick="openDeleteCompanyModal(${item.id})"><i class="fa-regular fa-trash-can"></i></button>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        function openEditCompanyModal(item) {
+            isEditing = true;
+            currentEditId = item.id;
+            document.getElementById('add_company_name').value = item.name;
+            document.getElementById('add_company_desc').value = item.description || '';
+            document.querySelector('#addCompanyModal .modal-title').textContent = 'Chỉnh Sửa';
+            document.getElementById('addCompanyModal').classList.add('active');
+        }
+
+        function openDeleteCompanyModal(id) {
+            companyToDelete = id;
+            elementToDelete = null; // Clear dept deletion flag
+            document.getElementById('deleteModal').classList.add('active');
+        }
+
+        // --- INIT & EVENT LISTENERS ---
+        // Department Form Submit
+            var addForm = document.getElementById('addForm');
+            if (addForm) {
+                addForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    var btn = e.target.querySelector('button[type="submit"]');
+                    var originalHtml = btn.innerHTML;
+                    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang lưu...';
+                    btn.disabled = true;
+                    var payload = {
+                        name: document.getElementById('add_name').value.trim(),
+                        description: document.getElementById('add_desc').value.trim()
+                    };
+                    try {
+                        var url = isEditing ? `/api/departments/${currentEditId}` : '/api/departments';
+                        var method = isEditing ? 'PUT' : 'POST';
+                        var res = await fetch(url, {
+                            method: method,
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+                        var data = await res.json();
+                        if(data.status === 'ok') {
+                            closeModal();
+                            showToast('Thành công', isEditing ? 'Đã cập nhật thông tin' : 'Đã thêm phòng ban mới', 'success');
+                            loadData();
+                        } else { showToast('Lỗi', data.message || 'Lỗi thao tác', 'error'); }
+                    } catch (err) { showToast('Lỗi', 'Lỗi kết nối máy chủ', 'error'); }
+                    finally { btn.innerHTML = originalHtml; btn.disabled = false; }
+                });
+            }
+
+            // Company Form Submit
+            var addCompanyForm = document.getElementById('addCompanyForm');
+            if (addCompanyForm) {
+                addCompanyForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    var btn = e.target.querySelector('button[type="submit"]');
+                    var originalHtml = btn.innerHTML;
+                    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang lưu...';
+                    btn.disabled = true;
+                    var payload = {
+                        name: document.getElementById('add_company_name').value.trim(),
+                        description: document.getElementById('add_company_desc').value.trim()
+                    };
+                    try {
+                        var url = isEditing ? `/api/companies/${currentEditId}` : '/api/companies';
+                        var method = isEditing ? 'PUT' : 'POST';
+                        var res = await fetch(url, {
+                            method: method,
+                            headers: {'Content-Type': 'application/json'},
+                            body: JSON.stringify(payload)
+                        });
+                        var data = await res.json();
+                        if (data.status === 'ok') {
+                            closeCompanyModal();
+                            loadCompanies();
+                            showToast('Thành công', isEditing ? 'Đã cập nhật thông tin' : 'Đã thêm công ty mới', 'success');
+                        } else { showToast('Lỗi', data.message, 'error'); }
+                    } catch (err) { showToast('Lỗi', 'Lỗi kết nối máy chủ', 'error'); }
+                    finally { btn.innerHTML = originalHtml; btn.disabled = false; }
+                });
+            }
+
+            // Global Delete Confirm Button
+            var confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+            if (confirmDeleteBtn) {
+                confirmDeleteBtn.addEventListener('click', async () => {
+                    var btn = confirmDeleteBtn;
+                    var originalText = btn.innerHTML;
+                    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang xoá...';
+                    btn.disabled = true;
+
+                    try {
+                        let url = '';
+                        if (companyToDelete) url = `/api/companies/${companyToDelete}`;
+                        else if (elementToDelete) url = `/api/departments/${elementToDelete}`;
+                        
+                        if (!url) return;
+
+                        const res = await fetch(url, { method: 'DELETE' });
+                        const data = await res.json();
+                        if (data.status === 'ok') {
+                            closeDeleteModal();
+                            showToast('Xoá thành công', 'Đã gỡ bỏ dữ liệu.', 'success');
+                            if (companyToDelete) loadCompanies();
+                            else loadData();
+                        } else { showToast('Lỗi', data.message || 'Lỗi xoá dữ liệu', 'error'); }
+                    } catch (err) { showToast('Lỗi', 'Lỗi kết nối máy chủ', 'error'); }
+                    finally { 
+                        btn.innerHTML = originalText; 
+                        btn.disabled = false; 
+                    }
+                });
+            }
+
+            // Load initial data
+            loadData();
+            loadCompanies();
+
     </script>
 </body>
 </html>

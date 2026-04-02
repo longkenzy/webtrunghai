@@ -9,10 +9,9 @@ const navigateTo = url => {
 
 const router = async () => {
     const routes = [
-        { path: "/", view: "home.html" },
         { path: "/equipment", view: "equipment.html" },
-        { path: "/repair", view: "repair.html" },
-        { path: "/available", view: "available.html" },
+        { path: "/photo-printer", view: "photo-printer.html" },
+        { path: "/camera-tv", view: "camera-tv.html" },
         { path: "/config", view: "config.html" },
     ];
 
