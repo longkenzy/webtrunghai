@@ -1164,7 +1164,8 @@ a {
 
 .expand-row {
     display: none;
-    background: #fafafa;
+    background: #f1f5f9; /* Màu nền xám xanh Slate-100 rõ rệt hơn */
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .expand-row.active {
@@ -1172,7 +1173,8 @@ a {
 }
 
 .expand-content {
-    padding: 12px 30px;
+    padding: 24px 40px;
+    border-left: 4px solid var(--primary); /* Thanh dọc màu xanh thương hiệu bên trái */
     animation: slideDown 0.3s ease-out;
 }
 
