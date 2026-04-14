@@ -53,6 +53,7 @@ app.post('/api/logout', (req, res) => {
 
 // Các file tĩnh được phép truy cập không cần auth
 app.use('/images', express.static(path.join(__dirname, '../public/images')));
+app.use('/@vercel/analytics', express.static(path.join(__dirname, '../node_modules/@vercel/analytics/dist')));
 app.get('/styles.css', (req, res) => res.sendFile(path.join(__dirname, '../public/styles.css')));
 app.get('/login.html', (req, res) => res.sendFile(path.join(__dirname, '../public/login.html')));
 
